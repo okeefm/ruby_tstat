@@ -20,12 +20,12 @@ class Tstat
   end
 
   # Returns result of POST for setting the heat target
-  def set_heat_target degrees
+  def set_heat_target degrees, type="heat"
     if @units == :c || @units == :celsius
      degrees = degrees * 9 / 5 + 32
     end
 
-    command = { :t_heat => degrees }.to_json
+    command = { "t_" + type  => degrees }.to_json
 
     HTTParty.post @tstat_ip + '/tstat/ttemp', :body => command, :headers => @headers
   end
