@@ -14,3 +14,6 @@ puts "Current indoor temp: #{ tstat.get_current_temp.to_s}"
 #Get today's/yesterday's system usage (today's heat by default)
 usage = tstat.get_usage
 puts "Yesterday's heat usage: #{ usage.to_s}"
+
+#Get thermostat mode
+puts "Thermostat mode: #{ tstat.get_thermostat_mode.to_s}"
