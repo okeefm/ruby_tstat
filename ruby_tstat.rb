@@ -9,18 +9,19 @@ require 'json'
 
 class Tstat
 
-  attr_accessor :tstat_ip
+  attr_accessor :tstat_ip, :units
 
   # Need to trick the thermostat into returning JSON instead of plain text
   @headers = { 'User-Agent' => 'foo' }
 
-  def initialize(tstat)
+  def initialize(tstat, units = :f)
     @tstat_ip = tstat
+    @units = units
   end
 
   # Returns result of POST for setting the heat target
-  def set_heat_target degrees, units = :f
-    if units == :c || units == :celsius
+  def set_heat_target degrees
+    if @units == :c || @units == :celsius
      degrees = degrees * 9 / 5 + 32
     end
 
@@ -29,29 +30,39 @@ class Tstat
     HTTParty.post @tstat_ip + '/tstat/ttemp', :body => command, :headers => @headers
   end
 
-  # Returns heat setpoint
-  def get_heat_target units = :f
+  # Returns setpoint (heat by default)
+  def get_setpoint(type="heat")
     result = HTTParty.get( @tstat_ip + '/tstat/ttemp', :headers => @headers )
     
-    degrees = result['t_heat']
+    degrees = result['t_' + type]
 
-    if units == :c || units == :celsius
+    if @units == :c || @units == :celsius
      degrees = ( degrees - 32 ) * 5 / 9
     end
 
     return degrees
   end
 
-  def get_current_temp units = :f
+  def get_current_temp
     result = HTTParty.get( @tstat_ip + '/tstat/temp', :headers => @headers) 
     
     degrees = result['temp']
 
-    if units == :c || units == :celsius
+    if @units == :c || @units == :celsius
      degrees = ( degrees - 32 ) * 5 / 9
     end
 
     return degrees
+  end
+
+  def get_usage(args= {})
+    args = {:day=>"today", :type=>"heat"}.merge(args)
+    result = HTTParty.get( @tstat_ip + '/tstat/datalog', :headers => @headers) 
+    
+    day = result[args[:day]]
+    runtime = day[args[:type] + '_runtime']
+
+    return runtime
   end
 
 end
