@@ -22,7 +22,7 @@ class Tstat
   end
 
   # Returns result of POST for setting the heat target
-  def set_temp_target degrees, type="heat"
+  def set_temp_target(degrees, type="heat")
     if @units == :c || @units == :celsius
      degrees = degrees * 9 / 5 + 32
     end
@@ -30,6 +30,20 @@ class Tstat
     command = { "t_" + type  => degrees }.to_json
 
     HTTParty.post @tstat_ip + '/tstat/ttemp', :body => command, :headers => @headers
+  end
+
+  #Sets thermostat mode
+  def set_thermostat_mode(mode)
+
+    #find the number for the string mode
+    if mode.is_a?(String)
+      mode = @@modes.key(mode.downcase)
+    end
+
+    command = { "tmode"  => mode }.to_json
+
+    result = HTTParty.post( @tstat_ip + "/tstat/tmode", :body => command, :headers => @headers )
+    return result
   end
 
   #Returns thermostat mode
