@@ -43,6 +43,7 @@ class Tstat
     return degrees
   end
 
+  #Returns the current temperature at the thermostat
   def get_current_temp
     result = HTTParty.get( @tstat_ip + '/tstat/temp', :headers => @headers) 
     
@@ -55,6 +56,7 @@ class Tstat
     return degrees
   end
 
+  #Returns the system usage (today's heat by default; cooling and/or yesterday's usage available by passing hash arguments)
   def get_usage(args= {})
     args = {:day=>"today", :type=>"heat"}.merge(args)
     result = HTTParty.get( @tstat_ip + '/tstat/datalog', :headers => @headers) 
