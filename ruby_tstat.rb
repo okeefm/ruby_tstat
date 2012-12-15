@@ -9,6 +9,8 @@ require 'json'
 
 class Tstat
 
+  @@modes = { 0 => "off", 1 => "heat", 2 => "cool", 3 => "auto" }
+
   attr_accessor :tstat_ip, :units
 
   # Need to trick the thermostat into returning JSON instead of plain text
@@ -20,7 +22,7 @@ class Tstat
   end
 
   # Returns result of POST for setting the heat target
-  def set_heat_target degrees, type="heat"
+  def set_temp_target degrees, type="heat"
     if @units == :c || @units == :celsius
      degrees = degrees * 9 / 5 + 32
     end
@@ -28,6 +30,12 @@ class Tstat
     command = { "t_" + type  => degrees }.to_json
 
     HTTParty.post @tstat_ip + '/tstat/ttemp', :body => command, :headers => @headers
+  end
+
+  #Returns thermostat mode
+  def get_thermostat_mode
+    result = HTTParty.get( @tstat_ip + "/tstat/tmode", :headers => @headers )
+    return @@modes[result["tmode"]]
   end
 
   # Returns setpoint (heat by default)
