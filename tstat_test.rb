@@ -20,5 +20,5 @@ puts "Thermostat mode: #{ tstat.get_thermostat_mode.to_s}"
 
 #set thermostat mode
 
-puts "Results of setting the thermostat mode: #{ tstat.set_thermostat_mode("heat") }"
+puts "Results of setting the thermostat mode: #{ tstat.set_thermostat_mode(1) }"
 
